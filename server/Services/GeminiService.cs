@@ -14,11 +14,11 @@ namespace server.Services
             // Configure retry options for transient server errors (503, 429, etc.)
             var retryOptions = new HttpRetryOptions
             {
-                Attempts = 3,                    // Try each model 3 times
-                InitialDelay = 2.0,              // Start with 2 seconds
-                ExpBase = 2.0,                   // Double the delay each time
-                MaxDelay = 30.0,                 // Cap at 30 seconds
-                Jitter = 1.0,                    // Add randomness
+                Attempts = 3,
+                InitialDelay = 2.0,
+                ExpBase = 2.0,
+                MaxDelay = 30.0,
+                Jitter = 1.0,
                 HttpStatusCodes = new List<int> { 408, 429, 500, 502, 503, 504 }
             };
 
@@ -104,10 +104,11 @@ Generate:
      the intended technical term can be confidently determined.
 
 Output requirements:
+- Return valid JSON only.
+- Do NOT wrap the JSON in markdown code fences.
+- Do NOT add commentary before or after the JSON.
 - Follow the required response schema exactly.
-- Return valid structured data according to the schema.
 - Do not add extra fields.
-- Do not add commentary outside the response schema.
 
 Video Transcript:
 {transcript}
@@ -115,18 +116,18 @@ Video Transcript:
 
             var config = new GenerateContentConfig
             {
+                ResponseMimeType = "application/json",
                 ThinkingConfig = new ThinkingConfig
                 {
                     ThinkingLevel = "minimal"
                 }
             };
 
-            // Fallback chain: try these models in order
-            // Primary has best quality, fallback has higher free-tier quota
+            // Fallback chain: primary (best quality) → fallback (higher quota)
             var modelsToTry = new[]
             {
-                "gemini-3.6-flash",      // Primary: best quality
-                "gemini-3.1-flash-lite"  // Fallback: much higher RPD on free tier
+                "gemini-3.6-flash",
+                "gemini-3.1-flash-lite"
             };
 
             Exception? lastException = null;
@@ -141,24 +142,54 @@ Video Transcript:
                         config: config
                     );
 
-                    if (string.IsNullOrEmpty(response.Text))
-                    {
-                        throw new Exception("Gemini returned an empty response.");
-                    }
-
-                    return response.Text;
+                    return CleanJson(response.Text!);
                 }
-                catch (Exception ex) when (ex.Message.Contains("high demand") ||
-                                           ex.Message.Contains("503") ||
-                                           ex.Message.Contains("UNAVAILABLE"))
+                catch (Exception ex) when (
+                    ex.Message.Contains("high demand") ||
+                    ex.Message.Contains("503") ||
+                    ex.Message.Contains("UNAVAILABLE"))
                 {
                     lastException = ex;
-                    // Brief pause before trying the next model
                     await Task.Delay(TimeSpan.FromSeconds(2));
                 }
             }
 
-            throw new Exception("All Gemini models are temporarily unavailable. Please try again later.", lastException);
+            throw new Exception(
+                "All Gemini models are temporarily unavailable. Please try again later.",
+                lastException);
+        }
+
+        /// <summary>
+        /// Strips markdown fences and stray text so the response is pure JSON.
+        /// </summary>
+        private static string CleanJson(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                throw new Exception("Gemini returned an empty response.");
+
+            var text = raw.Trim();
+
+            // Strip ```json ... ``` or ``` ... ``` fences
+            if (text.StartsWith("```"))
+            {
+                int firstNewline = text.IndexOf('\n');
+                if (firstNewline >= 0)
+                    text = text[(firstNewline + 1)..];
+
+                int lastFence = text.LastIndexOf("```", StringComparison.Ordinal);
+                if (lastFence >= 0)
+                    text = text[..lastFence];
+
+                text = text.Trim();
+            }
+
+            // Extract outermost { ... } if stray text remains
+            int start = text.IndexOf('{');
+            int end = text.LastIndexOf('}');
+            if (start >= 0 && end > start)
+                text = text[start..(end + 1)];
+
+            return text;
         }
     }
 }
