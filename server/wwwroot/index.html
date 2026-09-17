@@ -347,6 +347,14 @@
                 display: none;
             }
 
+        /* Make inner spans behave like blocks so layout is unchanged */
+        .upload-icon,
+        .upload-title,
+        .upload-subtitle,
+        .upload-formats {
+            display: block;
+        }
+
         .upload-icon {
             width: 48px;
             height: 48px;
@@ -386,6 +394,7 @@
             justify-content: center;
             font-size: 0.78rem;
             color: var(--text-muted);
+            margin: 0 auto;
         }
 
             .upload-formats .tag {
@@ -780,9 +789,7 @@
                 border-radius: 3px;
             }
 
-        /* ==========================================
-           QUIZ — MOBILE-FIRST, FIXED FOR SMALL SCREENS
-           ========================================== */
+        /* ---------- QUIZ ---------- */
         .quiz-container {
             display: none;
         }
@@ -907,7 +914,6 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             white-space: normal;
-            box-sizing: border-box;
         }
 
             .option .option-marker {
@@ -1178,10 +1184,7 @@
             display: none !important;
         }
 
-        /* ==========================================
-           RESPONSIVE
-           ========================================== */
-
+        /* ---------- RESPONSIVE ---------- */
         @media (max-width: 900px) {
             .instructions-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -1209,7 +1212,6 @@
                 font-size: 0.9rem;
             }
 
-            /* Instructions */
             .instructions {
                 padding: 1rem 1rem;
             }
@@ -1263,7 +1265,6 @@
                     font-size: 0.72rem;
                 }
 
-            /* Upload */
             .upload-area {
                 padding: 2rem 1.15rem;
             }
@@ -1282,7 +1283,6 @@
                 font-size: 0.95rem;
             }
 
-            /* Content */
             .content-title {
                 font-size: 1.2rem;
             }
@@ -1291,7 +1291,6 @@
                 font-size: 0.9rem;
             }
 
-            /* ========== QUIZ MOBILE FIX ========== */
             .quiz-container {
                 padding: 1.1rem 0.95rem;
             }
@@ -1336,10 +1335,6 @@
                 border-radius: var(--radius-sm);
                 align-items: flex-start;
                 line-height: 1.45;
-                width: 100%;
-                max-width: 100%;
-                min-width: 0;
-                overflow: hidden;
             }
 
                 .option .option-marker {
@@ -1348,13 +1343,6 @@
                     min-width: 20px;
                     font-size: 0.65rem;
                     margin-top: 0;
-                }
-
-                .option .option-text {
-                    flex: 1;
-                    min-width: 0;
-                    overflow-wrap: break-word;
-                    word-break: break-word;
                 }
 
             .explanation {
@@ -1380,14 +1368,12 @@
                     width: 100%;
                 }
 
-            /* File info */
             .file-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.25rem;
             }
 
-            /* Buttons */
             .button-row {
                 flex-direction: column;
             }
@@ -1396,7 +1382,6 @@
                     width: 100%;
                 }
 
-            /* Final */
             .final-score {
                 padding: 1.75rem 1rem;
             }
@@ -1426,7 +1411,6 @@
                 min-width: 100px;
             }
 
-            /* Header */
             .header-inner {
                 height: auto;
                 padding: 0.6rem 0;
@@ -1461,7 +1445,6 @@
                     height: 12px;
                 }
 
-            /* Footer */
             .footer-inner {
                 flex-direction: column;
                 align-items: flex-start;
@@ -1482,7 +1465,6 @@
                 font-size: 0.7rem;
             }
 
-            /* Quiz tiny screens */
             .question {
                 font-size: 0.92rem;
             }
@@ -1599,23 +1581,23 @@
 
             <label class="upload-area" for="videoInput" tabindex="0" role="button" aria-label="Select a video file">
 
-                <div class="upload-icon">
+                <span class="upload-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                </div>
+                </span>
 
-                <div class="upload-title">Select a video to get started</div>
-                <div class="upload-subtitle">Drag &amp; drop or click to browse</div>
+                <span class="upload-title">Select a video to get started</span>
+                <span class="upload-subtitle">Drag &amp; drop or click to browse</span>
 
-                <div class="upload-formats">
+                <span class="upload-formats">
                     <span class="tag">MP4</span>
                     <span class="tag">MOV</span>
                     <span class="tag">WebM</span>
                     <span>· Max 500 MB</span>
-                </div>
+                </span>
 
                 <input type="file" id="videoInput" accept="video/*" />
 
@@ -1771,9 +1753,6 @@
         /* ==========================================
          * CONFIGURATION
          * ========================================== */
-
-        // Relative URL — works in dev, Docker, IIS, Azure, etc.
-        // The HTML is served from wwwroot, so the API is on the same origin.
         const API_URL = "/api/Transcription/video";
 
         /* ==========================================
@@ -1916,31 +1895,31 @@
 
             showStatus(
                 `<div class="status-header">
-                 <span class="spinner"></span>
-                 Generating your learning content
-              </div>
-              <div class="processing-stages" id="processingStages">
-                 <div class="stage active" data-stage="upload">
-                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                     Uploading video
-                 </div>
-                 <div class="stage" data-stage="audio">
-                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                     Extracting audio
-                 </div>
-                 <div class="stage" data-stage="transcribe">
-                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                     Transcribing video
-                 </div>
-                 <div class="stage" data-stage="summary">
-                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                     Creating summary
-                 </div>
-                 <div class="stage" data-stage="quiz">
-                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-                     Generating quiz
-                 </div>
-              </div>`,
+                     <span class="spinner"></span>
+                     Generating your learning content
+                  </div>
+                  <div class="processing-stages" id="processingStages">
+                     <div class="stage active" data-stage="upload">
+                         <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                         Uploading video
+                     </div>
+                     <div class="stage" data-stage="audio">
+                         <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                         Extracting audio
+                     </div>
+                     <div class="stage" data-stage="transcribe">
+                         <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                         Transcribing video
+                     </div>
+                     <div class="stage" data-stage="summary">
+                         <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                         Creating summary
+                     </div>
+                     <div class="stage" data-stage="quiz">
+                         <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                         Generating quiz
+                     </div>
+                  </div>`,
                 ""
             );
 
@@ -2053,16 +2032,16 @@
             const diffLabel = diff.charAt(0).toUpperCase() + diff.slice(1);
 
             contentMeta.innerHTML = `
-             <span class="meta-item">
-                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <path d="M9 11l3 3L22 4"/>
-                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                 </svg>
-                 ${numQuestions} question${numQuestions !== 1 ? "s" : ""}
-             </span>
-             <span>·</span>
-             <span class="meta-item">${diffLabel} difficulty</span>
-         `;
+                 <span class="meta-item">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                         <path d="M9 11l3 3L22 4"/>
+                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                     </svg>
+                     ${numQuestions} question${numQuestions !== 1 ? "s" : ""}
+                 </span>
+                 <span>·</span>
+                 <span class="meta-item">${diffLabel} difficulty</span>
+             `;
 
             summary.textContent = content.summary || "No summary available.";
 
@@ -2165,6 +2144,40 @@
         }
 
         /* ==========================================
+         * RESOLVE CORRECT OPTION INDEX
+         * Handles: exact text, letter (A-D), index (0-3)
+         * ========================================== */
+        function resolveCorrectIndex(currentQuestion) {
+            const opts = currentQuestion.options || [];
+            const raw = currentQuestion.correct_answer;
+
+            if (!raw || opts.length === 0) return -1;
+
+            // 1. Explicit numeric index
+            if (typeof currentQuestion.correct_index === "number") {
+                const i = currentQuestion.correct_index;
+                if (i >= 0 && i < opts.length) return i;
+            }
+
+            // 2. Exact text match
+            const correct = normalizeAnswer(raw);
+            const byText = opts.findIndex(opt => normalizeAnswer(opt) === correct);
+            if (byText !== -1) return byText;
+
+            // 3. Letter match (A, B, C, D)
+            if (/^[a-f]$/i.test(String(raw).trim())) {
+                const idx = String(raw).trim().toUpperCase().charCodeAt(0) - 65;
+                if (idx >= 0 && idx < opts.length) return idx;
+            }
+
+            // 4. Numeric string ("0", "1", ...)
+            const num = parseInt(raw, 10);
+            if (!isNaN(num) && num >= 0 && num < opts.length) return num;
+
+            return -1;
+        }
+
+        /* ==========================================
          * SELECT ANSWER
          * ========================================== */
         function selectAnswer(selectedButton, selectedOption, currentQuestion) {
@@ -2172,23 +2185,20 @@
             if (answered) return;
             answered = true;
 
-            const correctAnswer = normalizeAnswer(currentQuestion.correct_answer);
-            const selectedAnswer = normalizeAnswer(selectedOption);
-            const allOptions = document.querySelectorAll(".option");
+            const correctIndex = resolveCorrectIndex(currentQuestion);
+            const allOptions = Array.from(document.querySelectorAll(".option"));
+            const selectedIndex = allOptions.indexOf(selectedButton);
 
-            allOptions.forEach(button => {
-                button.disabled = true;
-                const buttonText = button.querySelector(".option-text").textContent;
-                const buttonAnswer = normalizeAnswer(buttonText);
-                if (buttonAnswer === correctAnswer) {
-                    button.classList.add("correct");
+            allOptions.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === correctIndex) {
+                    btn.classList.add("correct");
                 }
             });
 
-            if (selectedAnswer === correctAnswer) {
+            if (selectedIndex === correctIndex) {
                 score++;
-                selectedButton.classList.add("correct");
-            } else {
+            } else if (selectedIndex !== -1) {
                 selectedButton.classList.add("wrong");
             }
 
@@ -2198,16 +2208,16 @@
             quizProgressFill.style.width = progressPercent + "%";
 
             explanation.innerHTML = `
-             <div class="explanation-label">
-                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <circle cx="12" cy="12" r="10"/>
-                     <line x1="12" y1="16" x2="12" y2="12"/>
-                     <line x1="12" y1="8" x2="12.01" y2="8"/>
-                 </svg>
-                 Explanation
-             </div>
-             ${currentQuestion.explanation || "No explanation provided."}
-         `;
+                 <div class="explanation-label">
+                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                         <circle cx="12" cy="12" r="10"/>
+                         <line x1="12" y1="16" x2="12" y2="12"/>
+                         <line x1="12" y1="8" x2="12.01" y2="8"/>
+                     </svg>
+                     Explanation
+                 </div>
+                 ${currentQuestion.explanation || "No explanation provided."}
+             `;
             explanation.style.display = "block";
             nextButton.disabled = false;
         }

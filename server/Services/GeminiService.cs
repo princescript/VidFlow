@@ -30,7 +30,7 @@ namespace server.Services
 
         public async Task<string> GenerateAsync(string transcript)
         {
-            var prompt = $"""
+            var prompt = $$"""
 You are an expert educational content generator.
 
 Analyze the following video transcript and create clear, accurate,
@@ -42,10 +42,6 @@ names, abbreviations, or words that sound similar.
 
 Correct obvious transcription errors using the context of the
 transcript and your general knowledge.
-
-For example, if a React transcript says "dipping" when the context
-clearly refers to comparing the Virtual DOM with the previous
-Virtual DOM, interpret it as "diffing".
 
 Important rules for correcting transcription errors:
 - Preserve the speaker's intended meaning.
@@ -64,54 +60,56 @@ or information that are unrelated to the transcript.
 
 Generate:
 
-1. Title
-   - Create a concise educational title describing the main topic.
-   - The title must accurately represent the content of the transcript.
+1. Title — concise educational title describing the main topic.
 
-2. Summary
-   - Provide a clear and concise summary of the transcript.
-   - Focus on the main concepts and ideas discussed by the speaker.
-   - Correct obvious transcription errors when necessary.
-   - Do not add unrelated information.
+2. Summary — clear, concise summary focused on the main concepts.
 
-3. Learning Objectives
-   - Generate 3 to 5 things a learner should understand after
-     studying the transcript.
-   - Objectives must be directly supported by the transcript.
-   - Focus on understanding concepts rather than memorizing sentences.
+3. Learning Objectives — 3 to 5 objectives directly supported by
+   the transcript.
 
-4. Important Points
-   - Generate EXACTLY 5 important concepts or facts from the transcript.
-   - Each point must be directly supported by the transcript.
-   - Correct obvious transcription errors when necessary.
-   - Do not introduce unrelated concepts.
+4. Important Points — EXACTLY 5 important concepts or facts.
 
-5. Multiple Choice Questions
-   - Generate EXACTLY 5 MCQs.
-   - Each question must have EXACTLY 4 options.
-   - There must be exactly ONE correct answer.
-   - Include an explanation for the correct answer.
-   - Assign each question a difficulty:
-     easy, medium, or hard.
-   - Questions should test understanding rather than simply copying
-     sentences from the transcript.
-   - All questions and answers must be based strictly on the transcript
-     after correcting obvious transcription errors.
-   - Do not create questions about concepts that were not discussed
-     in the transcript.
-   - Make sure the correct answer is actually supported by the transcript.
-   - Do not use incorrect transcription terms as correct answers when
-     the intended technical term can be confidently determined.
+5. Multiple Choice Questions — EXACTLY 5 MCQs, each with:
+   - EXACTLY 4 options
+   - exactly ONE correct answer
+   - an explanation
+   - a difficulty: easy, medium, or hard
 
 Output requirements:
 - Return valid JSON only.
 - Do NOT wrap the JSON in markdown code fences.
 - Do NOT add commentary before or after the JSON.
-- Follow the required response schema exactly.
 - Do not add extra fields.
 
+The JSON must match this EXACT schema:
+
+{
+  "title": "string",
+  "summary": "string",
+  "learning_objectives": ["string", "string", "string"],
+  "important_points": ["string", "string", "string", "string", "string"],
+  "multiple_choice_questions": [
+    {
+      "question": "string",
+      "options": ["string", "string", "string", "string"],
+      "correct_answer": "string",
+      "explanation": "string",
+      "difficulty": "easy"
+    }
+  ]
+}
+
+CRITICAL RULES for multiple_choice_questions:
+- "correct_answer" MUST be the EXACT full text of one of the
+  strings in "options".
+- Do NOT use letters like "A", "B", "C", "D".
+- Do NOT use an index number like 0, 1, 2, 3.
+- The text must match character-for-character, including
+  capitalization and punctuation.
+- "difficulty" must be exactly one of: "easy", "medium", "hard".
+
 Video Transcript:
-{transcript}
+{{transcript}}
 """;
 
             var config = new GenerateContentConfig
@@ -123,7 +121,6 @@ Video Transcript:
                 }
             };
 
-            // Fallback chain: primary (best quality) → fallback (higher quota)
             var modelsToTry = new[]
             {
                 "gemini-3.6-flash",
