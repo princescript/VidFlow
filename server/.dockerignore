@@ -1,0 +1,85 @@
+# ---------- .NET build output ----------
+bin/
+obj/
+**/bin/
+**/obj/
+*.dll
+*.pdb
+*.exe
+*.so
+*.dylib
+
+# ---------- Visual Studio / Rider / VS Code ----------
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# ---------- Test / coverage ----------
+[Tt]est[Rr]esult*/
+*.trx
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+# ---------- NuGet ----------
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+.nuget/
+
+# ---------- Node / frontend tooling (if any) ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---------- Git / VCS ----------
+.git/
+.gitignore
+.gitattributes
+.github/
+.gitlab-ci.yml
+
+# ---------- Docker itself (no need to copy into build context) ----------
+Dockerfile
+Dockerfile.*
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# ---------- OS junk ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# ---------- Logs / temp ----------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# ---------- Secrets / local config (IMPORTANT) ----------
+.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.key
+
+# ---------- Uploads / runtime data ----------
+uploads/
+wwwroot/uploads/
+ffmpeg/
+**/ffmpeg/

@@ -1,0 +1,2332 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VidFlow · Video to Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---------- DESIGN TOKENS ---------- */
+        :root {
+            --bg: #F7F8FA;
+            --surface: #FFFFFF;
+            --surface-soft: #FAFBFC;
+            --border: #E5E7EB;
+            --border-strong: #D1D5DB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-muted: #9CA3AF;
+            --brand: #2563EB;
+            --brand-hover: #1D4ED8;
+            --brand-soft: #EFF6FF;
+            --brand-border: #BFDBFE;
+            --brand-text: #1E40AF;
+            --success: #16A34A;
+            --success-soft: #F0FDF4;
+            --success-border: #BBF7D0;
+            --success-text: #166534;
+            --danger: #DC2626;
+            --danger-soft: #FEF2F2;
+            --danger-border: #FECACA;
+            --danger-text: #991B1B;
+            --warning: #D97706;
+            --warning-soft: #FFFBEB;
+            --warning-border: #FDE68A;
+            --warning-text: #92400E;
+            --shadow-xs: 0 1px 2px rgba(17, 24, 39, 0.04);
+            --shadow-sm: 0 1px 3px rgba(17, 24, 39, 0.05), 0 1px 2px rgba(17, 24, 39, 0.03);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --font-mono: ui-monospace, 'SF Mono', 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- HEADER ---------- */
+        .site-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            width: min(1080px, 92%);
+            margin: 0 auto;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .brand-mark {
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            background: var(--brand);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 0.2rem;
+            align-items: center;
+        }
+
+            .header-nav a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 500;
+                padding: 0.45rem 0.75rem;
+                border-radius: var(--radius-sm);
+                transition: all 0.15s ease;
+            }
+
+                .header-nav a:hover {
+                    color: var(--text-primary);
+                    background: var(--surface-soft);
+                }
+
+        .header-clock {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.7rem;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+        }
+
+            .header-clock svg {
+                width: 13px;
+                height: 13px;
+                color: var(--text-muted);
+                flex-shrink: 0;
+            }
+
+            .header-clock .time-value {
+                font-family: var(--font-mono);
+                color: var(--text-primary);
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+            }
+
+        /* ---------- LAYOUT ---------- */
+        .container {
+            width: min(1080px, 92%);
+            margin: 0 auto;
+            flex: 1;
+            padding: 3rem 0 4rem;
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            max-width: 620px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+
+            .hero h1 {
+                font-size: 2rem;
+                font-weight: 700;
+                letter-spacing: -0.025em;
+                line-height: 1.2;
+                margin-bottom: 0.75rem;
+                color: var(--text-primary);
+            }
+
+            .hero p {
+                color: var(--text-secondary);
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+        /* ---------- USER INSTRUCTION PANEL ---------- */
+        .instructions {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .instructions-head {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .instructions-head .badge {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: var(--brand-soft);
+                color: var(--brand);
+                display: grid;
+                place-items: center;
+                flex-shrink: 0;
+            }
+
+                .instructions-head .badge svg {
+                    width: 16px;
+                    height: 16px;
+                }
+
+            .instructions-head .title-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .instructions-head .title {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                letter-spacing: -0.01em;
+                line-height: 1.3;
+            }
+
+            .instructions-head .subtitle {
+                font-size: 0.78rem;
+                color: var(--text-muted);
+                font-weight: 400;
+                line-height: 1.4;
+            }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            padding: 0.9rem;
+            border-radius: var(--radius-md);
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            transition: all 0.15s ease;
+        }
+
+            .instruction-item:hover {
+                border-color: var(--brand-border);
+                background: var(--brand-soft);
+            }
+
+            .instruction-item .num {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: var(--brand);
+                color: #fff;
+                font-size: 0.7rem;
+                font-weight: 700;
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+
+            .instruction-item .text {
+                display: flex;
+                flex-direction: column;
+                gap: 0.15rem;
+                min-width: 0;
+            }
+
+            .instruction-item .title {
+                font-size: 0.82rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                line-height: 1.3;
+            }
+
+            .instruction-item .desc {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                line-height: 1.4;
+            }
+
+        /* ---------- CARD ---------- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            box-shadow: var(--shadow-xs);
+        }
+
+        /* ---------- UPLOAD AREA ---------- */
+        .upload-area {
+            display: block;
+            border: 2px dashed var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: var(--surface-soft);
+            outline: none;
+        }
+
+            .upload-area:focus-visible {
+                border-color: var(--brand);
+                box-shadow: 0 0 0 4px var(--brand-soft);
+            }
+
+            .upload-area:hover,
+            .upload-area.dragover {
+                border-color: var(--brand);
+                background: var(--brand-soft);
+            }
+
+            .upload-area input {
+                display: none;
+            }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: grid;
+            place-items: center;
+            color: var(--text-secondary);
+        }
+
+            .upload-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+
+        .upload-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.35rem;
+            color: var(--text-primary);
+        }
+
+        .upload-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .upload-formats {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+            .upload-formats .tag {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                padding: 0.2rem 0.6rem;
+                border-radius: var(--radius-sm);
+                font-weight: 500;
+                color: var(--text-secondary);
+            }
+
+        /* ---------- VIDEO WRAPPER ---------- */
+        .video-wrapper {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+            .video-wrapper video {
+                width: 100%;
+                max-height: 440px;
+                border-radius: var(--radius-md);
+                background: #0F172A;
+                display: block;
+                object-fit: contain;
+                border: 1px solid var(--border);
+            }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.85rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+        }
+
+        .file-name {
+            font-weight: 500;
+            word-break: break-all;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .file-name svg {
+                width: 15px;
+                height: 15px;
+                color: var(--text-muted);
+                flex-shrink: 0;
+            }
+
+        #fileSize {
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            white-space: nowrap;
+            background: var(--surface-soft);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* ---------- BUTTONS ---------- */
+        .button-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 1.2rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+            button:focus-visible {
+                outline: 2px solid var(--brand);
+                outline-offset: 2px;
+            }
+
+        .primary {
+            background: var(--brand);
+            color: #fff;
+            box-shadow: var(--shadow-xs);
+        }
+
+            .primary:hover:not(:disabled) {
+                background: var(--brand-hover);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .primary:disabled {
+                opacity: 0.45;
+                cursor: not-allowed;
+                box-shadow: none;
+            }
+
+        .secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+            .secondary:hover:not(:disabled) {
+                background: var(--surface-soft);
+                border-color: var(--border-strong);
+            }
+
+        button:disabled {
+            cursor: not-allowed;
+        }
+
+        /* ---------- STATUS ---------- */
+        .status {
+            display: none;
+            margin-top: 1.25rem;
+            padding: 1rem 1.15rem;
+            border-radius: var(--radius-md);
+            background: var(--brand-soft);
+            color: var(--brand-text);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--brand-border);
+            line-height: 1.55;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .status.error {
+            background: var(--danger-soft);
+            color: var(--danger-text);
+            border-color: var(--danger-border);
+        }
+
+        .status.success {
+            background: var(--success-soft);
+            color: var(--success-text);
+            border-color: var(--success-border);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.85rem;
+            color: var(--text-primary);
+        }
+
+            .status-header .spinner {
+                width: 14px;
+                height: 14px;
+                border: 2px solid var(--border);
+                border-top-color: var(--brand);
+                border-radius: 50%;
+                animation: spin 0.7s linear infinite;
+                flex-shrink: 0;
+            }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .processing-stages {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stage {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+
+            .stage .stage-icon {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 1.5px solid var(--border-strong);
+                flex-shrink: 0;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+            }
+
+                .stage .stage-icon svg {
+                    width: 10px;
+                    height: 10px;
+                    stroke: #fff;
+                    stroke-width: 3;
+                    fill: none;
+                    opacity: 0;
+                }
+
+            .stage.done {
+                color: var(--text-secondary);
+            }
+
+                .stage.done .stage-icon {
+                    background: var(--success);
+                    border-color: var(--success);
+                }
+
+                    .stage.done .stage-icon svg {
+                        opacity: 1;
+                    }
+
+            .stage.active {
+                color: var(--text-primary);
+                font-weight: 500;
+            }
+
+                .stage.active .stage-icon {
+                    border-color: var(--brand);
+                    background: var(--brand-soft);
+                }
+
+        /* ---------- RESULTS ---------- */
+        .results {
+            display: none;
+        }
+
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+            color: var(--text-primary);
+        }
+
+        .content-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 1.75rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .content-meta .meta-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+            }
+
+                .content-meta .meta-item svg {
+                    width: 14px;
+                    height: 14px;
+                    color: var(--text-muted);
+                }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+            .section-title:first-of-type {
+                margin-top: 0;
+            }
+
+            .section-title .count {
+                font-size: 0.75rem;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
+
+        .summary {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .list {
+            padding-left: 0;
+            list-style: none;
+            line-height: 1.65;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+            .list li {
+                position: relative;
+                padding-left: 1.4rem;
+            }
+
+                .list li::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0.6rem;
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    background: var(--brand);
+                }
+
+            .list.numbered {
+                counter-reset: item;
+            }
+
+                .list.numbered li {
+                    padding-left: 1.7rem;
+                    counter-increment: item;
+                }
+
+                    .list.numbered li::before {
+                        content: counter(item);
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: var(--brand-soft);
+                        color: var(--brand);
+                        font-size: 0.68rem;
+                        font-weight: 700;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        top: 0.15rem;
+                    }
+
+        /* ---------- TRANSCRIPT ---------- */
+        .transcript {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.4rem;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            max-height: 320px;
+            overflow-y: auto;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong) transparent;
+        }
+
+            .transcript::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .transcript::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .transcript::-webkit-scrollbar-thumb {
+                background: var(--border-strong);
+                border-radius: 3px;
+            }
+
+        /* ==========================================
+           QUIZ — MOBILE-FIRST, FIXED FOR SMALL SCREENS
+           ========================================== */
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .progress {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 500;
+            min-width: 0;
+        }
+
+            .progress strong {
+                color: var(--text-primary);
+                font-weight: 600;
+            }
+
+        .score {
+            font-weight: 500;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+            .score strong {
+                color: var(--brand);
+                font-weight: 700;
+            }
+
+        .quiz-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .quiz-progress-fill {
+            height: 100%;
+            background: var(--brand);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: var(--surface-soft);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+            .difficulty.easy {
+                background: var(--success-soft);
+                color: var(--success-text);
+                border-color: var(--success-border);
+            }
+
+            .difficulty.medium {
+                background: var(--warning-soft);
+                color: var(--warning-text);
+                border-color: var(--warning-border);
+            }
+
+            .difficulty.hard {
+                background: var(--danger-soft);
+                color: var(--danger-text);
+                border-color: var(--danger-border);
+            }
+
+        .question {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 1.35rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .option {
+            width: 100%;
+            max-width: 100%;
+            text-align: left;
+            padding: 0.85rem 1.1rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            font-weight: 400;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+            color: var(--text-primary);
+            cursor: pointer;
+            line-height: 1.45;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-family: inherit;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            box-sizing: border-box;
+        }
+
+            .option .option-marker {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                border-radius: 50%;
+                border: 1.5px solid var(--border-strong);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                font-size: 0.7rem;
+                font-weight: 600;
+                color: var(--text-muted);
+                transition: all 0.15s ease;
+                margin-top: 1px;
+            }
+
+            .option .option-text {
+                flex: 1;
+                min-width: 0;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .option:hover:not(:disabled) {
+                border-color: var(--brand);
+                background: var(--brand-soft);
+            }
+
+                .option:hover:not(:disabled) .option-marker {
+                    border-color: var(--brand);
+                    color: var(--brand);
+                }
+
+            .option:disabled {
+                cursor: default;
+            }
+
+            .option.correct {
+                background: var(--success-soft);
+                border-color: var(--success);
+                color: var(--success-text);
+                font-weight: 500;
+            }
+
+                .option.correct .option-marker {
+                    background: var(--success);
+                    border-color: var(--success);
+                    color: #fff;
+                }
+
+            .option.wrong {
+                background: var(--danger-soft);
+                border-color: var(--danger);
+                color: var(--danger-text);
+                font-weight: 500;
+            }
+
+                .option.wrong .option-marker {
+                    background: var(--danger);
+                    border-color: var(--danger);
+                    color: #fff;
+                }
+
+        .explanation {
+            display: none;
+            margin-top: 1.25rem;
+            padding: 1rem 1.15rem;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--brand);
+            border-radius: var(--radius-md);
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            animation: fadeIn 0.2s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .explanation-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-actions {
+            margin-top: 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ---------- FINAL SCORE ---------- */
+        .final-score {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .final-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            background: var(--brand-soft);
+            display: grid;
+            place-items: center;
+        }
+
+            .final-icon svg {
+                width: 26px;
+                height: 26px;
+                color: var(--brand);
+            }
+
+        .final-score h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .final-score-number {
+            font-size: 3.25rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .final-score-percentage {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--brand);
+            margin-bottom: 0.75rem;
+        }
+
+        .final-score p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .final-score-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.85rem 1.5rem;
+            min-width: 120px;
+            flex: 1 1 auto;
+            max-width: 160px;
+        }
+
+            .stat-box .stat-label {
+                font-size: 0.7rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--text-muted);
+                margin-bottom: 0.3rem;
+            }
+
+            .stat-box .stat-value {
+                font-size: 1.35rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                line-height: 1;
+            }
+
+            .stat-box.correct .stat-value {
+                color: var(--success);
+            }
+
+            .stat-box.wrong .stat-value {
+                color: var(--danger);
+            }
+
+        /* ---------- FOOTER ---------- */
+        .site-footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .footer-inner {
+            width: min(1080px, 92%);
+            margin: 0 auto;
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+            .footer-brand .brand-mark {
+                width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
+                border-radius: 6px;
+            }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+            .footer-links a {
+                color: var(--text-muted);
+                text-decoration: none;
+                transition: color 0.15s ease;
+            }
+
+                .footer-links a:hover {
+                    color: var(--text-primary);
+                }
+
+        .footer-time {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---------- UTILITY ---------- */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+           ========================================== */
+
+        @media (max-width: 900px) {
+            .instructions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 2rem 0 2.5rem;
+            }
+
+            .card {
+                padding: 1.15rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            /* Instructions */
+            .instructions {
+                padding: 1rem 1rem;
+            }
+
+            .instructions-head {
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.85rem;
+            }
+
+                .instructions-head .badge {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 7px;
+                }
+
+                    .instructions-head .badge svg {
+                        width: 14px;
+                        height: 14px;
+                    }
+
+                .instructions-head .title {
+                    font-size: 0.88rem;
+                }
+
+                .instructions-head .subtitle {
+                    font-size: 0.72rem;
+                }
+
+            .instructions-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .instruction-item {
+                padding: 0.7rem 0.75rem;
+                gap: 0.6rem;
+            }
+
+                .instruction-item .num {
+                    width: 20px;
+                    height: 20px;
+                    font-size: 0.65rem;
+                }
+
+                .instruction-item .title {
+                    font-size: 0.78rem;
+                }
+
+                .instruction-item .desc {
+                    font-size: 0.72rem;
+                }
+
+            /* Upload */
+            .upload-area {
+                padding: 2rem 1.15rem;
+            }
+
+            .upload-icon {
+                width: 44px;
+                height: 44px;
+            }
+
+                .upload-icon svg {
+                    width: 20px;
+                    height: 20px;
+                }
+
+            .upload-title {
+                font-size: 0.95rem;
+            }
+
+            /* Content */
+            .content-title {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+            }
+
+            /* ========== QUIZ MOBILE FIX ========== */
+            .quiz-container {
+                padding: 1.1rem 0.95rem;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .progress, .score {
+                font-size: 0.72rem;
+            }
+
+            .quiz-progress-bar {
+                margin-bottom: 1.1rem;
+            }
+
+            .difficulty {
+                font-size: 0.62rem;
+                padding: 0.18rem 0.5rem;
+                margin-bottom: 0.85rem;
+            }
+
+            .question {
+                font-size: 0.98rem;
+                line-height: 1.45;
+                margin-bottom: 1.1rem;
+                padding: 0;
+                word-break: break-word;
+            }
+
+            .options {
+                gap: 0.45rem;
+            }
+
+            .option {
+                padding: 0.75rem 0.85rem;
+                font-size: 0.85rem;
+                gap: 0.55rem;
+                border-radius: var(--radius-sm);
+                align-items: flex-start;
+                line-height: 1.45;
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                overflow: hidden;
+            }
+
+                .option .option-marker {
+                    width: 20px;
+                    height: 20px;
+                    min-width: 20px;
+                    font-size: 0.65rem;
+                    margin-top: 0;
+                }
+
+                .option .option-text {
+                    flex: 1;
+                    min-width: 0;
+                    overflow-wrap: break-word;
+                    word-break: break-word;
+                }
+
+            .explanation {
+                font-size: 0.82rem;
+                padding: 0.85rem 0.95rem;
+                margin-top: 1rem;
+                line-height: 1.55;
+            }
+
+            .explanation-label {
+                font-size: 0.68rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .quiz-actions {
+                flex-direction: column;
+                margin-top: 1.35rem;
+                padding-top: 1.1rem;
+                gap: 0.5rem;
+            }
+
+                .quiz-actions button {
+                    width: 100%;
+                }
+
+            /* File info */
+            .file-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            /* Buttons */
+            .button-row {
+                flex-direction: column;
+            }
+
+                .button-row button {
+                    width: 100%;
+                }
+
+            /* Final */
+            .final-score {
+                padding: 1.75rem 1rem;
+            }
+
+            .final-score-number {
+                font-size: 2.5rem;
+            }
+
+            .final-score h2 {
+                font-size: 1.15rem;
+                margin-bottom: 1.15rem;
+            }
+
+            .final-icon {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 1rem;
+            }
+
+                .final-icon svg {
+                    width: 22px;
+                    height: 22px;
+                }
+
+            .stat-box {
+                padding: 0.7rem 1.1rem;
+                min-width: 100px;
+            }
+
+            /* Header */
+            .header-inner {
+                height: auto;
+                padding: 0.6rem 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .header-nav {
+                gap: 0.1rem;
+            }
+
+                .header-nav a {
+                    padding: 0.35rem 0.55rem;
+                    font-size: 0.78rem;
+                }
+
+            .header-clock {
+                font-size: 0.72rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+                .header-clock svg {
+                    width: 12px;
+                    height: 12px;
+                }
+
+            /* Footer */
+            .footer-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+
+            .upload-area {
+                padding: 1.5rem 0.9rem;
+            }
+
+            .header-clock .time-value {
+                font-size: 0.7rem;
+            }
+
+            /* Quiz tiny screens */
+            .question {
+                font-size: 0.92rem;
+            }
+
+            .option {
+                font-size: 0.82rem;
+                padding: 0.7rem 0.75rem;
+                gap: 0.5rem;
+            }
+
+                .option .option-marker {
+                    width: 18px;
+                    height: 18px;
+                    min-width: 18px;
+                    font-size: 0.6rem;
+                }
+
+            .explanation {
+                font-size: 0.78rem;
+                padding: 0.75rem 0.85rem;
+            }
+
+            .progress, .score {
+                font-size: 0.68rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="brand">
+                <span class="brand-mark">V</span>
+                VidFlow
+            </a>
+            <div class="header-right">
+                <nav class="header-nav">
+                    <a href="#upload">Upload</a>
+                    <a href="#results">Results</a>
+                    <a href="#quiz">Quiz</a>
+                </nav>
+                <div class="header-clock" title="Local time">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span class="time-value" id="headerTime">--:--:--</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- HERO -->
+        <div class="hero" id="upload">
+            <h1>Turn video into a complete lesson</h1>
+            <p>Upload a video and get a structured summary, learning objectives, key points, transcript, and a knowledge quiz.</p>
+        </div>
+
+        <!-- USER INSTRUCTION PANEL -->
+        <div class="instructions">
+            <div class="instructions-head">
+                <div class="badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <div class="title-group">
+                    <span class="title">How to use VidFlow</span>
+                    <span class="subtitle">Follow these four steps to create and study a video lesson</span>
+                </div>
+            </div>
+
+            <div class="instructions-grid">
+                <div class="instruction-item">
+                    <span class="num">1</span>
+                    <div class="text">
+                        <span class="title">Upload your video</span>
+                        <span class="desc">Drag &amp; drop or click to select an MP4, MOV, or WebM file (up to 500 MB).</span>
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <span class="num">2</span>
+                    <div class="text">
+                        <span class="title">Generate learning content</span>
+                        <span class="desc">Click the button and let AI transcribe and structure your lesson.</span>
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <span class="num">3</span>
+                    <div class="text">
+                        <span class="title">Review the material</span>
+                        <span class="desc">Read the summary, learning objectives, key points, and full transcript.</span>
+                    </div>
+                </div>
+                <div class="instruction-item">
+                    <span class="num">4</span>
+                    <div class="text">
+                        <span class="title">Take the knowledge quiz</span>
+                        <span class="desc">Answer multiple-choice questions and check your score at the end.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPLOAD CARD -->
+        <div class="card">
+
+            <label class="upload-area" for="videoInput" tabindex="0" role="button" aria-label="Select a video file">
+
+                <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                </div>
+
+                <div class="upload-title">Select a video to get started</div>
+                <div class="upload-subtitle">Drag &amp; drop or click to browse</div>
+
+                <div class="upload-formats">
+                    <span class="tag">MP4</span>
+                    <span class="tag">MOV</span>
+                    <span class="tag">WebM</span>
+                    <span>· Max 500 MB</span>
+                </div>
+
+                <input type="file" id="videoInput" accept="video/*" />
+
+            </label>
+
+            <!-- VIDEO PREVIEW -->
+            <div class="video-wrapper" id="videoWrapper">
+
+                <video id="videoPreview" controls playsinline preload="metadata"></video>
+
+                <div class="file-info">
+                    <div class="file-name" id="fileName">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="23 7 16 12 23 17 23 7" />
+                            <rect x="1" y="5" width="15" height="14" rx="2" />
+                        </svg>
+                        <span id="fileNameText"></span>
+                    </div>
+                    <div id="fileSize"></div>
+                </div>
+
+                <div class="button-row">
+                    <button class="primary" id="processButton" onclick="processVideo()" disabled>
+                        Generate Learning Content
+                    </button>
+                    <button class="secondary" onclick="resetApplication()">
+                        Choose Another Video
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- STATUS -->
+            <div class="status" id="status" role="alert"></div>
+
+        </div>
+
+        <!-- RESULTS -->
+        <div class="results" id="results">
+
+            <div class="card">
+                <h2 class="content-title" id="contentTitle"></h2>
+                <div class="content-meta" id="contentMeta"></div>
+
+                <h3 class="section-title"><span>Summary</span></h3>
+                <p class="summary" id="summary"></p>
+
+                <h3 class="section-title">
+                    <span>Learning Objectives</span>
+                    <span class="count" id="objectivesCount"></span>
+                </h3>
+                <ul class="list" id="learningObjectives"></ul>
+
+                <h3 class="section-title">
+                    <span>Important Points</span>
+                    <span class="count" id="pointsCount"></span>
+                </h3>
+                <ol class="list numbered" id="importantPoints"></ol>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">
+                    <span>Transcript</span>
+                    <span class="count">Full video text</span>
+                </h3>
+                <div class="transcript" id="transcript"></div>
+            </div>
+
+            <div class="card quiz-container" id="quizContainer">
+
+                <h3 class="section-title">
+                    <span>Knowledge Check</span>
+                    <span class="count" id="quizTotalCount"></span>
+                </h3>
+
+                <div class="quiz-header">
+                    <div class="progress" id="quizProgress"></div>
+                    <div class="score" id="quizScore"></div>
+                </div>
+
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="quizProgressFill"></div>
+                </div>
+
+                <div class="difficulty" id="difficulty"></div>
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="explanation" id="explanation"></div>
+
+                <div class="quiz-actions">
+                    <button class="secondary" id="restartQuizButton" onclick="startQuiz()">Restart Quiz</button>
+                    <button class="primary" id="nextButton" onclick="nextQuestion()" disabled>Next Question</button>
+                </div>
+            </div>
+
+            <div class="card final-score hidden" id="finalScore">
+
+                <div class="final-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                </div>
+
+                <h2>Quiz Complete</h2>
+                <div class="final-score-number" id="finalScoreNumber"></div>
+                <div class="final-score-percentage" id="finalScorePercentage"></div>
+                <p id="finalScoreText"></p>
+
+                <div class="final-score-stats" id="finalScoreStats">
+                    <div class="stat-box correct">
+                        <div class="stat-label">Correct</div>
+                        <div class="stat-value" id="finalCorrect">0</div>
+                    </div>
+                    <div class="stat-box wrong">
+                        <div class="stat-label">Incorrect</div>
+                        <div class="stat-value" id="finalWrong">0</div>
+                    </div>
+                </div>
+
+                <button class="primary" onclick="startQuiz()">Try Again</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="brand-mark">V</span>
+                VidFlow
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
+            </div>
+            <div class="footer-time">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span id="footerTime">--:--:--</span>
+            </div>
+            <div>© <span id="footerYear"></span> VidFlow</div>
+        </div>
+    </footer>
+
+    <script>
+
+        /* ==========================================
+         * CONFIGURATION
+         * ========================================== */
+
+        // Relative URL — works in dev, Docker, IIS, Azure, etc.
+        // The HTML is served from wwwroot, so the API is on the same origin.
+        const API_URL = "/api/Transcription/video";
+
+        /* ==========================================
+         * STATE
+         * ========================================== */
+        let selectedFile = null;
+        let educationalContent = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        /* ==========================================
+         * DOM ELEMENTS
+         * ========================================== */
+        const videoInput = document.getElementById("videoInput");
+        const videoPreview = document.getElementById("videoPreview");
+        const videoWrapper = document.getElementById("videoWrapper");
+        const fileNameText = document.getElementById("fileNameText");
+        const fileSize = document.getElementById("fileSize");
+        const processButton = document.getElementById("processButton");
+        const statusElement = document.getElementById("status");
+        const results = document.getElementById("results");
+        const contentTitle = document.getElementById("contentTitle");
+        const contentMeta = document.getElementById("contentMeta");
+        const summary = document.getElementById("summary");
+        const learningObjectives = document.getElementById("learningObjectives");
+        const importantPoints = document.getElementById("importantPoints");
+        const objectivesCount = document.getElementById("objectivesCount");
+        const pointsCount = document.getElementById("pointsCount");
+        const transcript = document.getElementById("transcript");
+        const quizContainer = document.getElementById("quizContainer");
+        const quizProgress = document.getElementById("quizProgress");
+        const quizScore = document.getElementById("quizScore");
+        const quizTotalCount = document.getElementById("quizTotalCount");
+        const quizProgressFill = document.getElementById("quizProgressFill");
+        const difficulty = document.getElementById("difficulty");
+        const question = document.getElementById("question");
+        const options = document.getElementById("options");
+        const explanation = document.getElementById("explanation");
+        const nextButton = document.getElementById("nextButton");
+        const finalScore = document.getElementById("finalScore");
+        const finalScoreNumber = document.getElementById("finalScoreNumber");
+        const finalScorePercentage = document.getElementById("finalScorePercentage");
+        const finalScoreText = document.getElementById("finalScoreText");
+        const finalCorrect = document.getElementById("finalCorrect");
+        const finalWrong = document.getElementById("finalWrong");
+
+        /* ==========================================
+         * LIVE CLOCK
+         * ========================================== */
+        function updateClocks() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            const headerTimeEl = document.getElementById("headerTime");
+            const footerTimeEl = document.getElementById("footerTime");
+            if (headerTimeEl) headerTimeEl.textContent = timeStr;
+            if (footerTimeEl) footerTimeEl.textContent = timeStr;
+        }
+
+        /* ==========================================
+         * INIT
+         * ========================================== */
+        document.getElementById("footerYear").textContent = new Date().getFullYear();
+        updateClocks();
+        setInterval(updateClocks, 1000);
+
+        /* ==========================================
+         * VIDEO SELECTION
+         * ========================================== */
+        videoInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith("video/")) {
+                showStatus("Please select a valid video file.", "error");
+                return;
+            }
+
+            selectedFile = file;
+            const videoUrl = URL.createObjectURL(file);
+            videoPreview.src = videoUrl;
+            videoWrapper.style.display = "block";
+            fileNameText.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            processButton.disabled = false;
+            hideResults();
+            showStatus("Video selected. Click Generate Learning Content to process it.", "success");
+        });
+
+        /* Drag & drop */
+        const uploadZone = document.querySelector(".upload-area");
+
+        ["dragenter", "dragover"].forEach(evt =>
+            uploadZone.addEventListener(evt, e => {
+                e.preventDefault();
+                uploadZone.classList.add("dragover");
+            })
+        );
+
+        ["dragleave", "drop"].forEach(evt =>
+            uploadZone.addEventListener(evt, e => {
+                e.preventDefault();
+                uploadZone.classList.remove("dragover");
+            })
+        );
+
+        uploadZone.addEventListener("drop", e => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                videoInput.files = e.dataTransfer.files;
+                videoInput.dispatchEvent(new Event("change"));
+            }
+        });
+
+        uploadZone.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                videoInput.click();
+            }
+        });
+
+        /* ==========================================
+         * PROCESS VIDEO
+         * ========================================== */
+        async function processVideo() {
+
+            if (!selectedFile) {
+                showStatus("Please select a video first.", "error");
+                return;
+            }
+
+            processButton.disabled = true;
+
+            showStatus(
+                `<div class="status-header">
+                 <span class="spinner"></span>
+                 Generating your learning content
+              </div>
+              <div class="processing-stages" id="processingStages">
+                 <div class="stage active" data-stage="upload">
+                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                     Uploading video
+                 </div>
+                 <div class="stage" data-stage="audio">
+                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                     Extracting audio
+                 </div>
+                 <div class="stage" data-stage="transcribe">
+                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                     Transcribing video
+                 </div>
+                 <div class="stage" data-stage="summary">
+                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                     Creating summary
+                 </div>
+                 <div class="stage" data-stage="quiz">
+                     <span class="stage-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                     Generating quiz
+                 </div>
+              </div>`,
+                ""
+            );
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            const stageTimer = setInterval(() => {
+                const stageEls = document.querySelectorAll(".stage");
+                const activeIndex = Array.from(stageEls).findIndex(el => el.classList.contains("active"));
+                if (activeIndex >= 0 && activeIndex < stageEls.length - 1) {
+                    stageEls[activeIndex].classList.remove("active");
+                    stageEls[activeIndex].classList.add("done");
+                    stageEls[activeIndex + 1].classList.add("active");
+                }
+            }, 1200);
+
+            try {
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: formData
+                });
+
+                clearInterval(stageTimer);
+
+                if (!response.ok) {
+                    let errorMessage = "Server returned an error.";
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.title || errorMessage;
+                    } catch { /* ignore */ }
+                    throw new Error(`${response.status}: ${errorMessage}`);
+                }
+
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                document.querySelectorAll(".stage").forEach(el => {
+                    el.classList.remove("active");
+                    el.classList.add("done");
+                });
+
+                transcript.textContent = data.text || "No transcript returned.";
+
+                educationalContent = parseEducationalContent(data.educationalContent);
+                renderEducationalContent(educationalContent);
+
+                questions = educationalContent.multiple_choice_questions || [];
+
+                if (questions.length === 0) {
+                    throw new Error("No quiz questions were returned.");
+                }
+
+                results.style.display = "block";
+                startQuiz();
+                showStatus("Learning content generated successfully.", "success");
+                results.scrollIntoView({ behavior: "smooth" });
+
+            } catch (error) {
+                clearInterval(stageTimer);
+                console.error("Processing error:", error);
+                showStatus(error.message || "Something went wrong while processing the video.", "error");
+            } finally {
+                processButton.disabled = false;
+            }
+        }
+
+        /* ==========================================
+         * PARSE GEMINI JSON
+         * ========================================== */
+        function parseEducationalContent(rawContent) {
+
+            if (!rawContent) {
+                throw new Error("Gemini returned empty educational content.");
+            }
+
+            if (typeof rawContent === "object") {
+                return rawContent;
+            }
+
+            let jsonText = rawContent.trim();
+
+            if (jsonText.startsWith("```json")) {
+                jsonText = jsonText.substring(7);
+            }
+
+            if (jsonText.endsWith("```")) {
+                jsonText = jsonText.substring(0, jsonText.length - 3);
+            }
+
+            jsonText = jsonText.trim();
+
+            try {
+                return JSON.parse(jsonText);
+            } catch (error) {
+                console.error("Invalid Gemini JSON:", jsonText);
+                throw new Error("Gemini returned invalid JSON.");
+            }
+        }
+
+        /* ==========================================
+         * RENDER EDUCATIONAL CONTENT
+         * ========================================== */
+        function renderEducationalContent(content) {
+
+            contentTitle.textContent = content.title || "Untitled Lesson";
+
+            const numQuestions = (content.multiple_choice_questions || []).length;
+            const diff = (content.multiple_choice_questions?.[0]?.difficulty || "medium");
+            const diffLabel = diff.charAt(0).toUpperCase() + diff.slice(1);
+
+            contentMeta.innerHTML = `
+             <span class="meta-item">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M9 11l3 3L22 4"/>
+                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                 </svg>
+                 ${numQuestions} question${numQuestions !== 1 ? "s" : ""}
+             </span>
+             <span>·</span>
+             <span class="meta-item">${diffLabel} difficulty</span>
+         `;
+
+            summary.textContent = content.summary || "No summary available.";
+
+            learningObjectives.innerHTML = "";
+            const objectives = content.learning_objectives || [];
+            objectivesCount.textContent = `${objectives.length} item${objectives.length !== 1 ? "s" : ""}`;
+            objectives.forEach(objective => {
+                const li = document.createElement("li");
+                li.textContent = objective;
+                learningObjectives.appendChild(li);
+            });
+
+            importantPoints.innerHTML = "";
+            const points = content.important_points || [];
+            pointsCount.textContent = `${points.length} item${points.length !== 1 ? "s" : ""}`;
+            points.forEach(point => {
+                const li = document.createElement("li");
+                li.textContent = point;
+                importantPoints.appendChild(li);
+            });
+
+            quizTotalCount.textContent = `${numQuestions} question${numQuestions !== 1 ? "s" : ""}`;
+        }
+
+        /* ==========================================
+         * START QUIZ
+         * ========================================== */
+        function startQuiz() {
+
+            if (!questions.length) return;
+
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+
+            finalScore.classList.add("hidden");
+            quizContainer.style.display = "block";
+
+            renderQuestion();
+            quizContainer.scrollIntoView({ behavior: "smooth" });
+        }
+
+        /* ==========================================
+         * RENDER QUESTION
+         * ========================================== */
+        function renderQuestion() {
+
+            const currentQuestion = questions[currentQuestionIndex];
+            if (!currentQuestion) {
+                showFinalScore();
+                return;
+            }
+
+            answered = false;
+            nextButton.disabled = true;
+            nextButton.textContent = currentQuestionIndex === questions.length - 1
+                ? "Finish Quiz"
+                : "Next Question";
+
+            quizProgress.innerHTML = `Question <strong>${currentQuestionIndex + 1}</strong> of ${questions.length}`;
+            quizScore.innerHTML = `Score: <strong>${score}</strong> / ${questions.length}`;
+
+            const diff = (currentQuestion.difficulty || "medium").toLowerCase();
+            difficulty.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+            difficulty.className = "difficulty " + diff;
+
+            question.textContent = currentQuestion.question;
+
+            const progressPercent = (currentQuestionIndex / questions.length) * 100;
+            quizProgressFill.style.width = progressPercent + "%";
+
+            options.innerHTML = "";
+            explanation.style.display = "none";
+            explanation.innerHTML = "";
+
+            const letters = ["A", "B", "C", "D", "E", "F"];
+
+            currentQuestion.options.forEach((optionText, idx) => {
+
+                const button = document.createElement("button");
+                button.className = "option";
+
+                const marker = document.createElement("span");
+                marker.className = "option-marker";
+                marker.textContent = letters[idx] || "?";
+
+                const text = document.createElement("span");
+                text.className = "option-text";
+                text.textContent = optionText;
+
+                button.appendChild(marker);
+                button.appendChild(text);
+
+                button.addEventListener("click", () => {
+                    selectAnswer(button, optionText, currentQuestion);
+                });
+
+                options.appendChild(button);
+            });
+        }
+
+        /* ==========================================
+         * SELECT ANSWER
+         * ========================================== */
+        function selectAnswer(selectedButton, selectedOption, currentQuestion) {
+
+            if (answered) return;
+            answered = true;
+
+            const correctAnswer = normalizeAnswer(currentQuestion.correct_answer);
+            const selectedAnswer = normalizeAnswer(selectedOption);
+            const allOptions = document.querySelectorAll(".option");
+
+            allOptions.forEach(button => {
+                button.disabled = true;
+                const buttonText = button.querySelector(".option-text").textContent;
+                const buttonAnswer = normalizeAnswer(buttonText);
+                if (buttonAnswer === correctAnswer) {
+                    button.classList.add("correct");
+                }
+            });
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                selectedButton.classList.add("correct");
+            } else {
+                selectedButton.classList.add("wrong");
+            }
+
+            quizScore.innerHTML = `Score: <strong>${score}</strong> / ${questions.length}`;
+
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            quizProgressFill.style.width = progressPercent + "%";
+
+            explanation.innerHTML = `
+             <div class="explanation-label">
+                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <circle cx="12" cy="12" r="10"/>
+                     <line x1="12" y1="16" x2="12" y2="12"/>
+                     <line x1="12" y1="8" x2="12.01" y2="8"/>
+                 </svg>
+                 Explanation
+             </div>
+             ${currentQuestion.explanation || "No explanation provided."}
+         `;
+            explanation.style.display = "block";
+            nextButton.disabled = false;
+        }
+
+        /* ==========================================
+         * NORMALIZE ANSWER
+         * ========================================== */
+        function normalizeAnswer(value) {
+            if (!value) return "";
+            return value.trim().toLowerCase().replace(/\s+/g, " ");
+        }
+
+        /* ==========================================
+         * NEXT QUESTION
+         * ========================================== */
+        function nextQuestion() {
+
+            if (!answered) return;
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex >= questions.length) {
+                showFinalScore();
+                return;
+            }
+
+            renderQuestion();
+            quizContainer.scrollIntoView({ behavior: "smooth" });
+        }
+
+        /* ==========================================
+         * FINAL SCORE
+         * ========================================== */
+        function showFinalScore() {
+
+            quizContainer.style.display = "none";
+            finalScore.classList.remove("hidden");
+
+            const total = questions.length;
+            const wrong = total - score;
+            const percentage = Math.round((score / total) * 100);
+
+            finalScoreNumber.textContent = `${score} / ${total}`;
+            finalScorePercentage.textContent = `${percentage}%`;
+            finalCorrect.textContent = score;
+            finalWrong.textContent = wrong;
+
+            let message = "";
+            if (percentage >= 90) message = "Excellent understanding of the material.";
+            else if (percentage >= 70) message = "Good grasp of the material. Review any missed questions.";
+            else if (percentage >= 50) message = "Fair understanding. Consider reviewing the summary and transcript.";
+            else message = "Review the learning content and try the quiz again.";
+
+            finalScoreText.textContent = message;
+
+            quizProgressFill.style.width = "100%";
+        }
+
+        /* ==========================================
+         * RESET APPLICATION
+         * ========================================== */
+        function resetApplication() {
+
+            selectedFile = null;
+            educationalContent = null;
+            questions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+
+            videoInput.value = "";
+            videoPreview.pause();
+            videoPreview.removeAttribute("src");
+            videoPreview.load();
+
+            videoWrapper.style.display = "none";
+            results.style.display = "none";
+            quizContainer.style.display = "none";
+            finalScore.classList.add("hidden");
+            processButton.disabled = true;
+            hideStatus();
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        /* ==========================================
+         * HIDE RESULTS
+         * ========================================== */
+        function hideResults() {
+            results.style.display = "none";
+            quizContainer.style.display = "none";
+            finalScore.classList.add("hidden");
+        }
+
+        /* ==========================================
+         * STATUS
+         * ========================================== */
+        function showStatus(message, type) {
+            statusElement.innerHTML = message;
+            statusElement.style.display = "block";
+            statusElement.className = "status";
+            if (type) statusElement.classList.add(type);
+        }
+
+        function hideStatus() {
+            statusElement.style.display = "none";
+        }
+
+        /* ==========================================
+         * FILE SIZE
+         * ========================================== */
+        function formatFileSize(bytes) {
+            if (bytes === 0) return "0 Bytes";
+            const units = ["Bytes", "KB", "MB", "GB"];
+            const index = Math.floor(Math.log(bytes) / Math.log(1024));
+            return parseFloat((bytes / Math.pow(1024, index)).toFixed(2)) + " " + units[index];
+        }
+
+    </script>
+
+</body>
+</html>
